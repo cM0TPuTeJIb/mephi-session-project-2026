@@ -1,0 +1,101 @@
+1 ping -c 4 8.8.8.8 > ~/ping.out
+2 sudo dnf upgrade -y
+3 sudo dnf install -y nginx libcap-ng-utils
+4 sudo dnf install -y dnf-plugins-core
+5 cd /tmp
+6 dnf download tcpdump
+7 ls
+8 rm -f tcpdump-4.99.5-1.red80.i686.rpm
+9 sudo rpm -ivh /tmp/tcpdump-4.99.5-1.red80.x86_64.rpm
+10 ls
+11 lsblk
+12 sudo parted -s nvme0n1 mklabel gpt mkpart primary ext4 0% 100%
+13 sudo parted -s dev/nvme0n1 mklabel gpt mkpart primary ext4 0% 100%
+14 sudo parted -s /dev/nvme0n1 mklabel gpt mkpart primary ext4 0% 100%
+15 lsblk
+16 sudo mkfs.ext4 -L MEPHI_WEB /dev/nvme0n1p1
+17 sudo blkid /dev/nvme0n1p1
+18 ls /usr/lib/kbd/consolefonts/
+19 setfont ter-v20b
+20 clear
+21 sudo mkdir /mephi-web
+22 echo 'LABEL=MEPHI_WEB /mephi-web ext4 defaults 0 2' | sudo tee -a /etc/fstab
+23 sudo systemctl daemon-reload
+24 sudo mount /mephi-web
+25 findmnt /mephi-web
+26 sudo systemctl enable --now nginx
+27 systemctl status nginx
+28 systemctl is-enabled nginx
+29 sudo firewall-cmd --permanent --add-service=http
+30 sudo systemctl enable --now firewalld
+31 sudo systemctl status firewalld
+32 sudo firewall-cmd --permanent --add-service=http
+33 sudo firewall-cmd --reload
+34 sudo journalctl -u nginx -b > ~/journalctl.out
+35 sudo groupadd -g 4444 curators
+36 sudo groupadd -g 5500 mephi-dev
+37 sudo useradd -u 5501 -G mephi-dev user1
+38 sudo useradd -u 5502 -G mephi-dev user2
+39 sudo useradd -u 5503 -G mephi-dev user3
+40 sudo useradd -g curators curator1
+41 sudo useradd -g curators curator2
+42 for u in user1 user2 user3 curator1 curator2; do sudo passwd $u; done
+43 sudo mkdir -p /data/mephi-2026
+44 sudo chown root:mephi-dev /data/mephi-2026
+45 sudo chmod 2770 /data/mephi-2026
+46 sudo setfacl -R -m g:mephi-dev:rwX,g:curators:rX,o::- /data/mephi-2026
+47 sudo setfacl -d -m u::rwx,g::rwx,g:mephi-dev:rwx,g:curators:rx,o::- /data/mephi-2026
+48 getfacl /data/mephi-2026
+49 sudo -u user1 bash -c 'echo test > /data/mephi-2026/f1.txt'
+50 sudo -u user2 bash -c 'echo more >> /data/mephi-2026/f1.txt'
+51 sudo -u curator1 cat /data/mephi-2026/f1.txt
+52 sudo -u curator1 bash -c 'echo x >> /data/mephi-2026/f1.txt'
+53 sudo -u nobody ls /data/mephi-2026
+54 getfacl /data/mephi-2026 > ~/getfacl.out
+55 ls
+56 which tcpdump
+57 sudo chmod u-s /usr/sbin/tcpdump
+58 sudo setcap cap_net_raw,cap_net_admin=eip /usr/sbin/tcpdump
+59 getcap /usr/sbin/tcpdump
+60 filecap /usr/sbin/tcpdump
+61 sudo -u user1 tcpdump -i any -c 5
+62 getenforce
+63 grep ^SELINUX= /etc/selinux/config
+64 grep -n 'root' /etc/nginx/nginx.conf
+65 sudo sed -i 's#root\s*/usr/share/nginx/html;#root /mephi-web;#' /etc/nginx/nginx.conf
+66 sudo nginx -t
+67 sudo dnf install -y policycoreutils-python-utils
+68 sudo semanage fcontext -a -t httpd_sys_content_t "/mephi-web(/.*)?"
+69 sudo restorecon -Rv /mephi-web
+70 ls -Zd /mephi-web
+71 sudo systemctl restart nginx
+72 echo '-:(curators):LOCAL' | sudo tee -a /etc/security/access.conf
+73 grep -n '^account' /etc/pam.d/login
+74 sudo sed -i '0,/^account/s//account required pam_access.so\naccount/' /etc/pam.d/login
+75 grep -n 'pam_access' /etc/pam.d/login
+76 sudo sed -i 's/^PASS_MAX_DAYS.*/PASS_MAX_DAYS\t90/' /etc/login.defs
+77 for u in user1 user2 user3 curator1 curator2 $USER; do sudo chage -M 90 $u; done
+78 sudo chage -l user1
+79 sudo sed -i 's/^#\?\s*minlen\s*=./minlen = 12/' /etc/security/pwquality.conf
+80 grep minlen /etc/security/pwquality.conf
+81 sudo sed -i 's/^#\?\s*minlen\s*=./minlen = 12/' /etc/security/pwquality.conf
+82 grep minlen /etc/security/pwquality.conf
+83 echo "Hello from Student: 374337 | sudo tee /mephi-web/index.html
+84 echo "Hello from Student: 374337" | sudo tee /mephi-web/index.html
+85 sudo restorecon -v /mephi-web/index.html
+86 curl http://localhost/
+87 sudo reboot
+88 sudo dnf install -y git
+89 git config --global user.name "cM0TPuTeJIb"
+90 git config --global user.email "noexecutebit@gmail.com"
+91 cd ~/mephi-session-project-2026
+92 cp /tmp/tcpdump-*.x86_64.rpm .
+93 git init
+94 git add .
+95 sudo git add .
+96 git commit -m "Add MEPHI session project 2026 files"
+97 git branch -M main
+98 git remote add origin https://github.com/cM0TPuTeJIb/mephi-session-project-2026.git
+99 git push -u origin main
+100 exit
+
